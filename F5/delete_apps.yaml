@@ -1,0 +1,16 @@
+- name: Delete Apps
+  hosts: aws_bigip
+  gather_facts: false
+
+  tasks:
+
+  - name: Delete Apps (LTM)
+    uri:
+      url: "https://{{ hostvars[inventory_hostname]['provider']['server'] }}:{{ hostvars[inventory_hostname]['provider']['server_port'] }}/mgmt/shared/appsvcs/declare"
+      method: DELETE
+      user: admin
+      password: "{{ hostvars[inventory_hostname]['provider']['password'] }}"
+      status_code: 200
+      timeout: 300
+      validate_certs: no
+    delegate_to: localhost

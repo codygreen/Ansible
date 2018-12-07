@@ -1,0 +1,26 @@
+---
+- name: Create AS3 App
+  hosts: localhost
+  gather_facts: false
+  connection: local
+    
+  vars_files:
+    - vars/main.yaml
+
+  tasks:
+
+  - name: Create Directory Structure for Site/Tenant
+    file:
+      path: apps/{{item[0]}}/{{item[1]}}
+      state: directory
+    with_nested:
+      - "{{datacenters}}"
+      - "{{tenants}}"
+
+  - name: Create App File
+    template:
+      src: templates/app_templates/{{app_template}}.j2
+      dest: apps/{{item.datacenter_name}}/{{tenant}}/{{app_name}}.json
+      mode: 'preserve'
+    with_items: "{{ app_locations }}"
+

@@ -1,0 +1,5 @@
+datacenters:
+  - aws
+tenants:
+  - Tenant1
+f5_user: admin

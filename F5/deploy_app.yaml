@@ -1,0 +1,23 @@
+- name: Push BIG-IP
+  hosts: aws_bigip
+  gather_facts: false
+  connection: local
+
+  vars_files: 
+    - vars/main.yaml
+
+  tasks:
+
+  - name: Push AS3 (LTM)
+    uri:
+      url: "https://{{ hostvars[inventory_hostname]['provider']['server'] }}:{{ hostvars[inventory_hostname]['provider']['server_port'] }}/mgmt/shared/appsvcs/declare"
+      method: POST
+      user: admin
+      password: "{{ hostvars[inventory_hostname]['provider']['password'] }}"
+      #body: "{{ lookup('file','host_vars/' + inventory_hostname + '/apps.json') }}"
+      body: apps/{{datacenter_name}}/{{tenant}}/{{app_name}}.json
+      status_code: 200
+      timeout: 300
+      body_format: json
+      validate_certs: no
+    delegate_to: localhost

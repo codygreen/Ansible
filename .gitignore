@@ -1,0 +1,5 @@
+F5/apps/*
+F5/files/f5-appsvcs-*.rpm
+F5/files/f5-declarative-onboarding-*.rpm
+F5/host_vars/*/vault*
+testenv*
