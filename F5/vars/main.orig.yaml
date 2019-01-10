@@ -1,0 +1,18 @@
+datacenters:
+  - aws
+tenants:
+  - Tenant1
+f5_user: admin
+f5_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          123456789987654321345678987654323456789876543
+region: us-east-2
+template_url: https://s3.amazonaws.com/f5-cft/f5-existing-stack-payg-1nic-bigip.template
+vpc: vpc-1234567890
+subnet1Az1: subnet-1234567890
+imageName: Good25Mbps
+instanceType: t2.medium
+sshKey: my-key
+ssh_keyfile: "~/.ssh/my-key.pem"
+restrictedSrcAddress: 0.0.0.0/0
+restrictedSrcAddressApp: 0.0.0.0/0
