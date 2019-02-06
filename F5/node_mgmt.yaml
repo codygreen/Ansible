@@ -6,12 +6,15 @@
   vars_files:
     - vars/main.yaml
   vars:
+    # FQDN of the BIG-IP
     bigip: "{{ bigip }}"
+    # management port
     server_port: "{{ server_port }}"
-    node: 1.1.1.1
-    # state most be enabled or disabled
+    # node IP addresses list
+    nodes: [1.1.1.1, 2.2.2.2]
+    # state most be enabled or disabled (default is disabled)
     state: "disabled"
-    exists: false
+    # variables required by F5 module
     provider:
           user: "{{ f5_user }}"
           server: "{{ bigip }}"
@@ -29,14 +32,14 @@
     
     - debug: echo {{ item }}
       loop: "{{ query('items', '{{ nodes_output.nodes }}') }}"
-      when: item.address == node
+      when: item.address in nodes
 
     - name: Enable/Disable a node
       bigip_node:
         state: "{{ state }}"
         partition: Common
-        name: "{{ node }}"
+        name: "{{ item.name }}"
         provider: "{{ provider }}"
       loop: "{{ query('items', '{{ nodes_output.nodes }}') }}"
-      when: item.address == node 
+      when: item.address in nodes
   
