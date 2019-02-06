@@ -1,0 +1,42 @@
+--- # Manage a BIG-IP node
+
+- name: Manage a BIG-IP node
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/main.yaml
+  vars:
+    bigip: "{{ bigip }}"
+    server_port: "{{ server_port }}"
+    node: 1.1.1.1
+    # state most be enabled or disabled
+    state: "disabled"
+    exists: false
+    provider:
+          user: "{{ f5_user }}"
+          server: "{{ bigip }}"
+          server_port: "{{ server_port }}"
+          password: "{{ f5_password }}"
+          validate_certs: no
+
+  tasks:
+    - name: Get nodes
+      register: nodes_output
+      bigip_device_facts:
+        gather_subset: 
+          - nodes
+        provider: "{{ provider }}"
+    
+    - debug: echo {{ item }}
+      loop: "{{ query('items', '{{ nodes_output.nodes }}') }}"
+      when: item.address == node
+
+    - name: Enable/Disable a node
+      bigip_node:
+        state: "{{ state }}"
+        partition: Common
+        name: "{{ node }}"
+        provider: "{{ provider }}"
+      loop: "{{ query('items', '{{ nodes_output.nodes }}') }}"
+      when: item.address == node 
+  
