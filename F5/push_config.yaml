@@ -9,6 +9,7 @@
 
   tasks:
 
+
   - name: Create tmp Directory for Declarations
     file:
       path: tmp/
@@ -37,36 +38,21 @@
     command: "ls tmp/"
     register: dir_out
 
-  - set_fact:
-    # fqdn: "{{ hostvars[item].public_dns_name | with_items: groups['all'] }}"
-      fqdn: "{{ hostvars[item].public_dns_name }}"
-    with_items:
-      - "{{ groups['all'] }}"
-
   - name: URI POST Tenant
     uri:
-      #url: "https://{{ groups[item.split('-')[0]][0] }}:{{hostvars[groups[item.split('-')[0]][0]]['f5_admin_port']}}/mgmt/shared/appsvcs/declare"
-      #url: "https://{{ hostvars[inventory_hostname]['provider']['server'] }}:{{ hostvars[inventory_hostname]['provider']['server_port'] }}/mgmt/shared/appsvcs/declare"
-      url: "https://{{ fqdn }}:8443/mgmt/shared/appsvcs/declare"
+      url: "https://{{ groups[item.split('-')[0]][0] }}:{{hostvars[groups[item.split('-')[0]][0]]['f5_admin_port']}}/mgmt/shared/appsvcs/declare"
       method: POST
-      user: "{{ f5_user }}"
-      #password: "{{ hostvars[groups[item.split('-')[0]][0]]['f5_password'] }}"
-      #password: "{{ hostvars[inventory_hostname]['provider']['password'] }}"
+      user: "admin"
       password: "{{ f5_password }}"
       validate_certs: no
       body: "{{ lookup('template', 'templates/tenant_base.j2') }}"
       body_format: json
     with_items:
       - "{{dir_out.stdout_lines}}"
-
+  
   - name: Remove Temporary Combined File
     file:
       path: tmp/{{item}}
       state: absent
     with_items:
       - "{{dir_out.stdout_lines}}"
-
-  # - debug:
-  #   msg: "{{ hostvars[item].public_dns_name }}"
-  # with_items:
-  #   - "{{ groups['all'] }}"
