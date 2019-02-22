@@ -9,6 +9,13 @@
     stack_name: "cody-ansible-test"
 
   tasks:
+  # Get My IP Address
+  - name: Get public IP address
+    uri: 
+      url: "http://checkip.amazonaws.com"
+      return_content: yes
+    register: myip
+
   # Deploy BIG-IP in AWS
   - name: Deploy a BIG-IP in AWS via CFT
     register: deploy_output
@@ -23,8 +30,8 @@
         imageName: "{{ imageName }}"
         instanceType: "{{ instanceType }}"
         sshKey: "{{ sshKey }}"
-        restrictedSrcAddress: "{{ restrictedSrcAddress }}"
-        restrictedSrcAddressApp: "{{ restrictedSrcAddressApp }}"
+        restrictedSrcAddress: "{{ myip.content | replace('\n', '') }}/32"
+        restrictedSrcAddressApp: "{{ myip.content | replace('\n', '') }}/32"
 
   # Wait for BIG-IP to be ready
   - name: Wait for BIG-IP to be ready
@@ -77,5 +84,5 @@
       body_format: json
       validate_certs: no
 
-  # - debug:
-  #     var: deploy_output.stack_outputs
+  - debug:
+      var: deploy_output.stack_outputs
